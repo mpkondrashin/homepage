@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+<title>Trend Micro | Bookmarks</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width">
+<link rel="icon" href="/favicon.ico" type="image/x-icon">
+<style>
+	* {
+		font: 15px arial, sans-serif;	
+		color: #FFFFFF;
+		margin: 0px;
+		padding: 0px;
+	}
+	body {
+		margin: 5px;
+		background-color: {{ .BackgroudColor }};
+	}
+	a.button {
+	color: #FFFFFF;
+	    display: inline-block;
+	    min-width: 130px;
+//	    max-width: 240px;
+	    padding: 15px 15px 8px 15px;
+	    margin: 2px 2px 4px 2px;
+	    text-decoration: none;
+	}
+	a.button:hover {
+	    border: 2px solid {{ .LighterBackgroudColor }};
+	    margin: 0px 0px 2px 0px;
+	}
+	div.section {
+/*		margin: 0px 0px 0px 0px;*/
+/*		padding: 7px;*/
+/*		border: 1px dashed #FFFFFF;*/
+	}
+
+table.separator {
+/*		border: 1px dashed #FFFFFF;*/
+	margin-top: 10px;
+	width: 100%;
+}
+
+table.separator tr td:nth-of-type(1) { 
+	width: 150px;
+}
+
+table.separator tr td:nth-of-type(3) { 
+	width: 100%;
+}
+table.separator hr {
+	  border-top: 1px dashed #FFF;
+	  border-bottom: none;
+/*  color: #fff;
+  background-color: #fff;*/
+  height: 0px;
+  width:100%;
+}
+table.separator tr td:nth-of-type(1) hr {
+  width: 20px;
+}
+</style>
+</head>
+<body>
+{{ range $section, $bookmarks := .Sections }}
+<table class="separator">
+  <tr>
+    <td><hr /></td>
+    <td style="width:1px; padding: 0 10px; white-space: nowrap;">{{ $section }}</td>
+    <td><hr /></td>
+  </tr>
+</table>
+<div class="section">
+   {{ range $bkm := $bookmarks }}
+    	<a href=" {{ $bkm.Url }}" class="button" style="background-color: {{ $bkm.Color}};" title=" {{ $bkm.Tooltip }}"> {{ $bkm.Label }}</a>
+   {{ end }}
+</div>
+{{ end }}
+</body>
+</html>

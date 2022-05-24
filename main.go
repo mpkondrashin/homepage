@@ -1,6 +1,7 @@
 package main
 
 import (
+	_ "embed"
 	"fmt"
 	"html/template"
 	"io/ioutil"
@@ -11,6 +12,9 @@ import (
 
 	"gopkg.in/yaml.v2"
 )
+
+//go:embed index.template
+var templData string
 
 var (
 	MetroBackground = []string{"#004050", "#0e6d38", "#001941", "#260930", "#261300"}
@@ -57,17 +61,20 @@ type P struct {
 	A string
 }
 
+const dataFileName = "data.yaml"
+
 func main() {
-	yamlData, err := ioutil.ReadFile("data.yaml")
+	yamlData, err := ioutil.ReadFile(dataFileName)
 	if err != nil {
 		log.Fatal(err)
 	}
+	log.Printf("Loaded %s file (%d bytes)", dataFileName, len(yamlData))
 	var bookmarks Bookmarks
 	err = yaml.Unmarshal(yamlData, &bookmarks)
 	if err != nil {
 		log.Fatal(err)
 	}
-	log.Printf("Loaded %d bookmarks", len(bookmarks.Bookmarks))
+	log.Printf("Parsed %d bookmarks", len(bookmarks.Bookmarks))
 	page := Page{
 		Sections: make(map[string][]Bookmark),
 	}
@@ -81,11 +88,11 @@ func main() {
 	page.BackgroudColor = BackgroundColor()
 	page.LighterBackgroudColor = lighter(page.BackgroudColor)
 	//log.Println(page)
-	templData, err := ioutil.ReadFile("index.template")
-	if err != nil {
-		log.Fatal(err)
-	}
-	templ, err := template.New("HomePage").Parse(string(templData))
+	//	templData, err := ioutil.ReadFile("index.template")
+	//	if err != nil {
+	//		log.Fatal(err)
+	//	}
+	templ, err := template.New("HomePage").Parse(templData)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -96,26 +103,3 @@ func main() {
 	}
 	log.Println("Done")
 }
-
-/*
-func main() {
-	// "section,url,label,tooltip"
-	csvF, err := os.Open("data.csv")
-	if err != nil {
-		log.Fatal(err)
-	}
-	r := csv.NewReader(csvF)
-
-	for {
-		record, err := r.Read()
-		if err == io.EOF {
-			break
-		}
-		if err != nil {
-			log.Fatal(err)
-		}
-		fmt.Println(record)
-	}
-}
-
-*/

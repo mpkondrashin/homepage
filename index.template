@@ -26,7 +26,7 @@
 	    text-decoration: none;
 	}
 	a.button:hover {
-	    border: 2px solid {{ .LighterBackgroudColor }};
+	    border: 2px solid {{ .LighterColor }};
 	    margin: 0px 0px 2px 0px;
 	}
 	div.section {
@@ -70,10 +70,9 @@ table.separator tr td:nth-of-type(1) hr {
     <td><hr /></td>
   </tr>
 </table>
-<div class="section">
-   {{ range $bkm := $bookmarks }}
-    	<a href=" {{ $bkm.Url }}" class="button" style="background-color: {{ $bkm.Color}};" title=" {{ $bkm.Tooltip }}"> {{ $bkm.Label }}</a>
-   {{ end }}
+
+<div class="section">{{ range $bkm := $bookmarks }}
+    	<a href="{{ $bkm.Url }}" class="button" style="background-color: {{ $bkm.Color}};" title="{{ $bkm.Tooltip }}">{{ $bkm.Label }}</a>{{ end }}
 </div>
 {{ end }}
 </body>

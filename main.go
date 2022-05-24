@@ -1,10 +1,17 @@
+/*
+HomePage (c) 2022 by Michael Kondrashin
+
+HomePage - generate bookmarks
+
+main.go - main source file
+*/
+
 package main
 
 import (
 	_ "embed"
 	"fmt"
 	"html/template"
-	"io/ioutil"
 	"log"
 	"os"
 	"strconv"
@@ -52,52 +59,69 @@ type Bookmarks struct {
 }
 
 type Page struct {
-	BackgroudColor        string
-	LighterBackgroudColor string
-	Sections              map[string][]Bookmark
+	BackgroudColor string
+	LighterColor   string
+	Sections       map[string][]Bookmark
 }
 
 type P struct {
 	A string
 }
 
-const dataFileName = "data.yaml"
-
 func main() {
-	yamlData, err := ioutil.ReadFile(dataFileName)
+	if len(os.Args) != 3 {
+		fmt.Printf("Homepage - generate HTML for your bookmarks using yaml file.\nUsage: %s <input yaml file> <output HTML file>\n",
+			os.Args[0])
+		return
+	}
+	log.Println("Homepage started")
+	dataFileName := os.Args[1]
+	htmlFileName := os.Args[2]
+	inFile := os.Stdin
+	if dataFileName != "-" {
+		var err error
+		inFile, err = os.Open(dataFileName)
+		if err != nil {
+			log.Fatal(err)
+		}
+	}
+	var yamlData []byte
+	size, err := inFile.Read(yamlData)
 	if err != nil {
 		log.Fatal(err)
 	}
-	log.Printf("Loaded %s file (%d bytes)", dataFileName, len(yamlData))
+	log.Printf("Loaded %s file (%d bytes)", dataFileName, size)
 	var bookmarks Bookmarks
 	err = yaml.Unmarshal(yamlData, &bookmarks)
 	if err != nil {
 		log.Fatal(err)
 	}
 	log.Printf("Parsed %d bookmarks", len(bookmarks.Bookmarks))
+	bc := BackgroundColor()
 	page := Page{
-		Sections: make(map[string][]Bookmark),
+		BackgroudColor: bc,
+		LighterColor:   lighter(bc),
+		Sections:       make(map[string][]Bookmark),
 	}
 	colorIndex := 0
 	for _, b := range bookmarks.Bookmarks {
-		//log.Print(b.Section)
 		b.Color = MetroColors[colorIndex%len(MetroColors)]
 		colorIndex++
 		page.Sections[b.Section] = append(page.Sections[b.Section], b)
 	}
-	page.BackgroudColor = BackgroundColor()
-	page.LighterBackgroudColor = lighter(page.BackgroudColor)
-	//log.Println(page)
-	//	templData, err := ioutil.ReadFile("index.template")
-	//	if err != nil {
-	//		log.Fatal(err)
-	//	}
 	templ, err := template.New("HomePage").Parse(templData)
 	if err != nil {
 		log.Fatal(err)
 	}
 	log.Println("Template OK")
-	err = templ.Execute(os.Stdout, &page)
+	f := os.Stdout
+	if htmlFileName != "-" {
+		f, err = os.Create(htmlFileName)
+		if err != nil {
+			log.Fatal(err)
+		}
+	}
+	err = templ.Execute(f, &page)
 	if err != nil {
 		log.Fatal(err)
 	}

@@ -12,6 +12,7 @@ import (
 	_ "embed"
 	"fmt"
 	"html/template"
+	"io"
 	"log"
 	"os"
 	"strconv"
@@ -85,12 +86,11 @@ func main() {
 			log.Fatal(err)
 		}
 	}
-	var yamlData []byte
-	size, err := inFile.Read(yamlData)
+	yamlData, err := io.ReadAll(inFile)
 	if err != nil {
 		log.Fatal(err)
 	}
-	log.Printf("Loaded %s file (%d bytes)", dataFileName, size)
+	log.Printf("Loaded %s file (%d bytes)", dataFileName, len(yamlData))
 	var bookmarks Bookmarks
 	err = yaml.Unmarshal(yamlData, &bookmarks)
 	if err != nil {

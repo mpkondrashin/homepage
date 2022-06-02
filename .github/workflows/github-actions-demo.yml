@@ -22,6 +22,11 @@ jobs:
           go get -u golang.org/x/lint/golint
       - name: Run build
         run: go build .
+      - run: echo "Build is finished"
+      - name: Run vet & lint
+        run: |
+          go vet .
+          golint .
       - run: echo "🖥️ The workflow is now ready to test your code on the runner."
       - name: List files in the repository
         run: |

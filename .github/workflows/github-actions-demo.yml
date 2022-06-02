@@ -1,4 +1,4 @@
-name: GitHub Actions Demo
+name: Build Home Page
 on: [push]
 jobs:
   Explore-GitHub-Actions:
@@ -10,6 +10,18 @@ jobs:
       - name: Check out repository code
         uses: actions/checkout@v3
       - run: echo "💡 The ${{ github.repository }} repository has been cloned to the runner."
+
+      - name: Setup Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: '1.18.2'
+      - run: echo "Go installed"
+      - name: Install dependencies
+        run: |
+          go version
+          go get -u golang.org/x/lint/golint
+      - name: Run build
+        run: go build .
       - run: echo "🖥️ The workflow is now ready to test your code on the runner."
       - name: List files in the repository
         run: |

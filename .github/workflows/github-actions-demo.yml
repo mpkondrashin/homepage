@@ -23,13 +23,18 @@ jobs:
       - name: Run build
         run: go build .
       - run: echo "Build is finished"
-      - name: Run vet & lint
-        run: |
-          go vet .
-          golint .
+#      - name: Run vet & lint
+#        run: |
+#          go vet .
+#          golint .
       - run: echo "🖥️ The workflow is now ready to test your code on the runner."
       - name: List files in the repository
         run: |
           ls ${{ github.workspace }}
+      - name: Upload Artifact to release
+        uses: actions/upload-artifact@v2
+        with: 
+          name: homepage-result
+          path: homepage
       - run: echo "🍏 This job's status is ${{ job.status }}."
 

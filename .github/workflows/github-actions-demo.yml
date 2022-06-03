@@ -1,4 +1,4 @@
-name: Build Home Page
+#https://trstringer.com/github-actions-create-release-upload-artifacts/name: Build Home Page
 on: [push]
 jobs:
   Explore-GitHub-Actions:
@@ -31,10 +31,21 @@ jobs:
       - name: List files in the repository
         run: |
           ls ${{ github.workspace }}
-      - name: Upload Artifact to release
-        uses: actions/upload-artifact@v2
-        with: 
-          name: homepage-result
-          path: homepage
+#      - name: Upload Artifact to release
+#        uses: actions/upload-artifact@v2
+#        with: 
+#          name: homepage-result
+#          path: homepage
+#      - name: build artifacts
+#        run: make build-linux && make build-windows && make build-darwin
+      - name: upload linux artifact
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: homepage.linux-amd64.tar.gz
+          asset_name: homepage.linux-amd64.tar.gz
+          asset_content_type: application/gzip
       - run: echo "🍏 This job's status is ${{ job.status }}."
 

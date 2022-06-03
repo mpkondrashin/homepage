@@ -26,7 +26,7 @@ jobs:
 #      - name: Run vet & lint
 #        run: |
 #          go vet .
-#          golint . 
+#          golint  . 
       - name: Pack
         run: tar cfvz homepage.tgz homepage
       - run: echo "🖥️ The workflow is now ready to test your code on the runner."

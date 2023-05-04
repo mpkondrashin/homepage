@@ -10,6 +10,7 @@ package main
 
 import (
 	_ "embed"
+	"errors"
 	"fmt"
 	"html/template"
 	"io"
@@ -55,6 +56,10 @@ type Bookmark struct {
 	Color   string
 }
 
+func (b Bookmark) String() string {
+	return fmt.Sprintf("%s: %s (%s)", b.Section, b.Label, b.Url)
+}
+
 type Bookmarks struct {
 	Bookmarks []Bookmark
 }
@@ -65,8 +70,22 @@ type Page struct {
 	Sections       map[string][]Bookmark
 }
 
-type P struct {
-	A string
+var ErrDuplicate = errors.New("duplicate")
+
+func CheckForDuplicates(b *Bookmarks) error {
+	urls := make(map[string]struct{})
+	labels := make(map[string]struct{})
+	for _, each := range b.Bookmarks {
+		if _, ok := urls[each.Url]; ok {
+			return fmt.Errorf("%v: URL %w", each, ErrDuplicate)
+		}
+		urls[each.Url] = struct{}{}
+		if _, ok := labels[each.Label]; ok {
+			return fmt.Errorf("%v: Label %w", each, ErrDuplicate)
+		}
+		labels[each.Label] = struct{}{}
+	}
+	return nil
 }
 
 func main() {
@@ -91,12 +110,16 @@ func main() {
 		log.Fatal(err)
 	}
 	log.Printf("Loaded %s file (%d bytes)", dataFileName, len(yamlData))
+
 	var bookmarks Bookmarks
-	err = yaml.Unmarshal(yamlData, &bookmarks)
-	if err != nil {
+	if err := yaml.Unmarshal(yamlData, &bookmarks); err != nil {
 		log.Fatal(err)
 	}
 	log.Printf("Parsed %d bookmarks", len(bookmarks.Bookmarks))
+	if err := CheckForDuplicates(&bookmarks); err != nil {
+		log.Fatal(err)
+	}
+
 	bc := BackgroundColor()
 	page := Page{
 		BackgroudColor: bc,
@@ -121,8 +144,7 @@ func main() {
 			log.Fatal(err)
 		}
 	}
-	err = templ.Execute(f, &page)
-	if err != nil {
+	if err := templ.Execute(f, &page); err != nil {
 		log.Fatal(err)
 	}
 	log.Println("Done")
